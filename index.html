@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake Bots</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <div id="menu-overlay">
+      <div class="menu-decor" aria-hidden="true"></div>
+
+      <div class="menu-content">
+        <header class="menu-header">
+          <h1>SNAKE<span>BOTS</span></h1>
+          <p class="tagline">Domine. Cresça. Sobreviva.</p>
+        </header>
+
+        <button id="play-button" type="button">
+          <span class="play-icon">&#9654;</span>
+          <span class="play-text">
+            Jogar
+            <small>Entrar na arena</small>
+          </span>
+        </button>
+
+        <div class="menu-panels">
+          <section class="menu-panel">
+            <h2>Conquistas <span id="achievements-count"></span></h2>
+            <ul id="achievements-list"></ul>
+          </section>
+
+          <section class="menu-panel">
+            <h2>Novidades</h2>
+            <ul class="whats-new">
+              <li><strong>Personalidades dos bots</strong><span>Comilao, Medroso e Malvado, cada um com seu jeito</span></li>
+              <li><strong>Ciclo de dia e noite</strong><span>Os bots enxergam e reagem diferente a noite</span></li>
+              <li><strong>Eventos aleatorios</strong><span>Chuva de comida, comida gigante e nevoa</span></li>
+            </ul>
+          </section>
+
+          <section class="menu-panel">
+            <h2>Controles</h2>
+            <ul class="controls-list">
+              <li><strong>Mouse / toque</strong><span>Direciona a cobra</span></li>
+              <li><strong>Segurar espaco / clique</strong><span>Impulso (consome tamanho)</span></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="gameover-overlay" class="hidden">
+      <div class="gameover-card">
+        <h2 class="gameover-title">Game Over</h2>
+
+        <div class="gameover-stats">
+          <p>Score final: <strong id="gameover-score">0</strong></p>
+          <p>Posicao: <strong id="gameover-position">#1</strong></p>
+        </div>
+
+        <p class="gameover-hint">Clique ou pressione Espaco para jogar de novo</p>
+
+        <div class="gameover-actions">
+          <button id="restart-button" type="button" class="gameover-button restart">
+            <span class="gameover-icon">&#8635;</span>
+            <span class="gameover-button-text">
+              Jogar de novo
+              <small>Pressione Espaco</small>
+            </span>
+          </button>
+
+          <button id="menu-button" type="button" class="gameover-button to-menu">
+            <span class="gameover-icon">&#8962;</span>
+            <span class="gameover-button-text">
+              Ir para o menu
+              <small>Voltar ao menu inicial</small>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
