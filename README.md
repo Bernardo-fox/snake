@@ -6,14 +6,30 @@ Jogo web estilo Snake.io com bots, mapa com bordas e drops de comida valiosos.
 
 - Node.js 18+
 
-## Como rodar
+Para verificar se voce ja tem instalado:
 
 ```bash
+node -v
+```
+
+Se der erro de comando nao encontrado, instale o Node em [nodejs.org](https://nodejs.org) (versao LTS) ou, no Mac, via [Homebrew](https://brew.sh):
+
+```bash
+brew install node
+```
+
+## Como instalar e rodar
+
+```bash
+git clone <url-do-repositorio>
+cd snake-bots
 npm install
 npm run dev
 ```
 
 Abra `http://localhost:5173` no navegador. A tela inicial mostra suas conquistas e as novidades do jogo; clique em "Jogar" para entrar na arena.
+
+> O jogo roda localmente (nao tem link publico). Enquanto o terminal com `npm run dev` estiver aberto, o endereco continua acessivel; se fechar, e so rodar `npm run dev` de novo dentro da pasta do projeto.
 
 ## Controles
 
