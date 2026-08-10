@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(zsh -lc 'npx tsc --noEmit')"
-    ]
-  }
-}
