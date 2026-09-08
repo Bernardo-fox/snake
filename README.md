@@ -33,8 +33,8 @@ Abra `http://localhost:5173` no navegador. A tela inicial mostra suas conquistas
 
 ## Controles
 
-- **Mouse / touch**: direciona a cobra
-- **Segurar Espaco, clique ou toque**: impulso (mais velocidade, consome um pouco do tamanho)
+- **Mouse / arrastar o dedo**: direciona a cobra
+- **Segurar Espaco, clique ou o botao de impulso (aparece em telas de toque)**: impulso (mais velocidade, consome um pouco do tamanho)
 - **Espaco / clique**: reinicia apos game over
 
 ## Mecanicas
@@ -49,7 +49,7 @@ Abra `http://localhost:5173` no navegador. A tela inicial mostra suas conquistas
 
 - **Comilao** (laranja) - Guloso, Faminto, Ganancioso, Devorador: prioriza comida, grande campo de visao para comida
 - **Medroso** (tons pastel) - Medroso, Fujao, Assustado, Tremulo: foge de qualquer cobra que se aproxime, so busca comida quando esta seguro
-- **Malvado** (vermelho escuro) - Assassino, Cruel, Predador: vai ativamente atras do jogador, mais rapido e mais agressivo, tenta cortar seu caminho
+- **Malvado** (vermelho escuro) - Assassino, Cruel, Predador: vai ativamente atras de quem estiver mais perto (bot ou jogador, sem distincao), mais rapido e mais agressivo, tenta cortar o caminho da presa
 
 ## Ciclo de dia e noite
 
@@ -78,3 +78,7 @@ Progresso salvo no navegador (persiste entre sessoes). Contador no HUD, aviso na
 ## Rei da Arena
 
 A cobra viva com maior pontuacao usa uma coroa dourada acima da cabeca, visivel no mapa, alem de um icone ao lado do nome dela no ranking Top 5 — assim da pra saber quem esta em primeiro mesmo de longe.
+
+## Mensagens de eliminacao
+
+Sempre que uma cobra (bot ou jogador) elimina outra, uma mensagem tipo "Predador eliminou Guloso" aparece no canto inferior esquerdo por alguns segundos, colorida com a cor de quem eliminou.

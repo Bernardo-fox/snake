@@ -5,6 +5,7 @@ import type { BotStrategy, DirectionDecision } from "../BotStrategy";
 import {
   dangerLookAhead,
   findNearestFood,
+  findNearestThreat,
   fogVisionMultiplier,
   resolveSafeAngle,
   urgentChaseRadius,
@@ -27,23 +28,20 @@ export class EvilStrategy implements BotStrategy {
     const huntVisionRadius =
       (isNight ? this.huntVisionRadius * NIGHT_HUNT_VISION_MULTIPLIER : this.huntVisionRadius) *
       fogMultiplier;
-    const player = world.player;
+    const prey = findNearestThreat(snake, world, huntVisionRadius);
 
-    if (player?.alive) {
-      const distToPlayer = distance(snake.head, player.head);
+    if (prey) {
+      const distToPrey = distance(snake.head, prey.head);
+      const leadDistance = this.aggressiveness * 60 * (isNight ? NIGHT_LEAD_MULTIPLIER : 1);
+      const leadPoint = {
+        x: prey.x + Math.cos(prey.angle) * leadDistance,
+        y: prey.y + Math.sin(prey.angle) * leadDistance,
+      };
+      const chaseAngle = angleBetween(snake.head, leadPoint);
+      const isUrgentKill = distToPrey < urgentChaseRadius(snake) * 1.5;
 
-      if (distToPlayer <= huntVisionRadius) {
-        const leadDistance = this.aggressiveness * 60 * (isNight ? NIGHT_LEAD_MULTIPLIER : 1);
-        const target = {
-          x: player.x + Math.cos(player.angle) * leadDistance,
-          y: player.y + Math.sin(player.angle) * leadDistance,
-        };
-        const chaseAngle = angleBetween(snake.head, target);
-        const isUrgentKill = distToPlayer < urgentChaseRadius(snake) * 1.5;
-
-        const { angle, usedPreferred } = resolveSafeAngle(snake, world, chaseAngle, lookAhead);
-        return { angle, urgent: usedPreferred && isUrgentKill };
-      }
+      const { angle, usedPreferred } = resolveSafeAngle(snake, world, chaseAngle, lookAhead);
+      return { angle, urgent: usedPreferred && isUrgentKill };
     }
 
     const food = findNearestFood(snake, world, this.foodVisionRadius * fogMultiplier);

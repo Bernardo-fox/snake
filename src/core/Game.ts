@@ -64,6 +64,10 @@ export class Game {
     this.resetGame();
   }
 
+  setBoostButtonHeld(held: boolean): void {
+    this.input.setExternalBoost(held);
+  }
+
   start(): void {
     this.renderer.resize();
     this.camera.setViewport(this.canvas.width, this.canvas.height);
@@ -153,6 +157,7 @@ export class Game {
     this.world.dayNight.update(dt);
     this.world.totalElapsedMs += dt * 1000;
     this.world.events.update(this.world, now);
+    this.world.killFeed.update(now);
 
     if (this.state !== "playing") {
       if (this.world.player) {
@@ -197,6 +202,10 @@ export class Game {
     const deaths = this.collision.checkSnakeCollisions(this.world);
     for (const { snake, killer } of deaths) {
       this.foodSystem.spawnDeathDrops(this.world, snake);
+
+      if (killer) {
+        this.world.killFeed.push(killer.name, killer.color, snake.name, now);
+      }
 
       if (killer?.isPlayer) {
         this.world.playerStats.kills++;

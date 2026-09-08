@@ -19,6 +19,7 @@ const gameoverScore = document.getElementById("gameover-score");
 const gameoverPosition = document.getElementById("gameover-position");
 const restartButton = document.getElementById("restart-button");
 const menuButton = document.getElementById("menu-button");
+const boostButton = document.getElementById("boost-button");
 
 let game: Game | null = null;
 
@@ -76,3 +77,22 @@ menuButton?.addEventListener("click", () => {
   gameoverOverlay?.classList.add("hidden");
   showMenu();
 });
+
+function setBoostHeld(held: boolean): void {
+  game?.setBoostButtonHeld(held);
+  boostButton?.classList.toggle("active", held);
+}
+
+boostButton?.addEventListener(
+  "touchstart",
+  (event) => {
+    event.preventDefault();
+    setBoostHeld(true);
+  },
+  { passive: false },
+);
+boostButton?.addEventListener("touchend", () => setBoostHeld(false));
+boostButton?.addEventListener("touchcancel", () => setBoostHeld(false));
+boostButton?.addEventListener("mousedown", () => setBoostHeld(true));
+boostButton?.addEventListener("mouseup", () => setBoostHeld(false));
+boostButton?.addEventListener("mouseleave", () => setBoostHeld(false));

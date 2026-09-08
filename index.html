@@ -2,12 +2,19 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <title>Snake Bots</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <canvas id="game"></canvas>
+
+    <button id="boost-button" type="button" aria-label="Impulso">
+      <span class="boost-icon">&#9889;</span>
+    </button>
 
     <div id="menu-overlay">
       <div class="menu-decor" aria-hidden="true"></div>
@@ -44,8 +51,8 @@
           <section class="menu-panel">
             <h2>Controles</h2>
             <ul class="controls-list">
-              <li><strong>Mouse / toque</strong><span>Direciona a cobra</span></li>
-              <li><strong>Segurar espaco / clique</strong><span>Impulso (consome tamanho)</span></li>
+              <li><strong>Mouse / arrastar o dedo</strong><span>Direciona a cobra</span></li>
+              <li><strong>Segurar espaco, clique ou o botao de impulso</strong><span>Mais velocidade (consome tamanho)</span></li>
             </ul>
           </section>
         </div>

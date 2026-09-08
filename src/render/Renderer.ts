@@ -62,15 +62,32 @@ export class Renderer {
     }
   }
 
+  private hudLayout(): {
+    narrow: boolean;
+    boxWidth: number;
+    rankingX: number;
+    rankingY: number;
+    bannerY: number;
+  } {
+    const narrow = this.canvas.width < 480;
+    const boxWidth = narrow ? Math.max(150, Math.min(200, this.canvas.width - 32)) : 220;
+    const rankingX = narrow ? 16 : this.canvas.width - boxWidth - 16;
+    const rankingY = narrow ? 16 + 134 + 8 : 16;
+    const bannerY = narrow ? rankingY + 140 + 8 : 60;
+    return { narrow, boxWidth, rankingX, rankingY, bannerY };
+  }
+
   renderHud(world: World, state: GameState, achievements: AchievementManager): void {
     const player = world.player;
     if (!player) return;
 
+    const layout = this.hudLayout();
+
     this.ctx.save();
     this.ctx.fillStyle = "rgba(13, 17, 23, 0.75)";
-    this.ctx.fillRect(16, 16, 220, 134);
+    this.ctx.fillRect(16, 16, layout.boxWidth, 134);
     this.ctx.strokeStyle = "#30363d";
-    this.ctx.strokeRect(16, 16, 220, 134);
+    this.ctx.strokeRect(16, 16, layout.boxWidth, 134);
 
     this.ctx.fillStyle = "#f0f6fc";
     this.ctx.font = "16px system-ui, sans-serif";
@@ -85,7 +102,7 @@ export class Renderer {
     this.ctx.fillStyle = player.boosting ? "#58a6ff" : "#8b949e";
     this.ctx.font = "13px system-ui, sans-serif";
     this.ctx.fillText(
-      player.boosting ? "Impulso ativo!" : "Segure Espaco/clique: Impulso",
+      player.boosting ? "Impulso ativo!" : "Segure/toque: Impulso",
       28,
       110,
     );
@@ -97,10 +114,11 @@ export class Renderer {
       130,
     );
 
-    this.renderRanking(world);
-    this.renderDayNightIndicator(world);
-    this.renderEventBanner(world);
-    this.renderAchievementBanner(achievements);
+    this.renderRanking(world, layout);
+    this.renderDayNightIndicator(world, layout);
+    this.renderEventBanner(world, layout);
+    this.renderAchievementBanner(achievements, layout);
+    this.renderKillFeed(world);
 
     if (state === "gameover") {
       this.renderGameOver(world);
@@ -109,11 +127,11 @@ export class Renderer {
     this.ctx.restore();
   }
 
-  private renderDayNightIndicator(world: World): void {
+  private renderDayNightIndicator(world: World, layout: ReturnType<Renderer["hudLayout"]>): void {
     const isNight = world.dayNight.isNight;
     const label = isNight ? "Noite" : "Dia";
     const width = 100;
-    const x = this.canvas.width / 2 - width / 2;
+    const x = layout.narrow ? this.canvas.width - width - 16 : this.canvas.width / 2 - width / 2;
     const y = 16;
 
     this.ctx.fillStyle = "rgba(13, 17, 23, 0.75)";
@@ -128,15 +146,29 @@ export class Renderer {
     this.ctx.textAlign = "start";
   }
 
-  private renderEventBanner(world: World): void {
+  private fitBannerFont(text: string): number {
+    const maxTextWidth = this.canvas.width - 72;
+    let fontSize = 16;
+    this.ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+    const textWidth = this.ctx.measureText(text).width;
+
+    if (textWidth > maxTextWidth) {
+      fontSize = Math.max(11, Math.floor((fontSize * maxTextWidth) / textWidth));
+      this.ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+    }
+
+    return fontSize;
+  }
+
+  private renderEventBanner(world: World, layout: ReturnType<Renderer["hudLayout"]>): void {
     const text = world.events.bannerText;
     if (!text) return;
 
-    this.ctx.font = "bold 16px system-ui, sans-serif";
+    this.fitBannerFont(text);
     const textWidth = this.ctx.measureText(text).width;
-    const boxWidth = textWidth + 40;
+    const boxWidth = Math.min(textWidth + 40, this.canvas.width - 32);
     const x = this.canvas.width / 2 - boxWidth / 2;
-    const y = 60;
+    const y = layout.bannerY;
 
     this.ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
     this.ctx.fillRect(x, y, boxWidth, 36);
@@ -145,19 +177,22 @@ export class Renderer {
 
     this.ctx.fillStyle = "#f4d35e";
     this.ctx.textAlign = "center";
-    this.ctx.fillText(text, this.canvas.width / 2, y + 24);
+    this.ctx.fillText(text, x + boxWidth / 2, y + 24);
     this.ctx.textAlign = "start";
   }
 
-  private renderAchievementBanner(achievements: AchievementManager): void {
+  private renderAchievementBanner(
+    achievements: AchievementManager,
+    layout: ReturnType<Renderer["hudLayout"]>,
+  ): void {
     const text = achievements.bannerText;
     if (!text) return;
 
-    this.ctx.font = "bold 16px system-ui, sans-serif";
+    this.fitBannerFont(text);
     const textWidth = this.ctx.measureText(text).width;
-    const boxWidth = textWidth + 40;
+    const boxWidth = Math.min(textWidth + 40, this.canvas.width - 32);
     const x = this.canvas.width / 2 - boxWidth / 2;
-    const y = 104;
+    const y = layout.bannerY + 44;
 
     this.ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
     this.ctx.fillRect(x, y, boxWidth, 36);
@@ -166,34 +201,57 @@ export class Renderer {
 
     this.ctx.fillStyle = "#c4a7f0";
     this.ctx.textAlign = "center";
-    this.ctx.fillText(text, this.canvas.width / 2, y + 24);
+    this.ctx.fillText(text, x + boxWidth / 2, y + 24);
     this.ctx.textAlign = "start";
   }
 
-  private renderRanking(world: World): void {
+  private renderRanking(world: World, layout: ReturnType<Renderer["hudLayout"]>): void {
     const alive = world.getRanking().filter((snake) => snake.alive).slice(0, 5);
     const leader = world.getLeader();
+    const { rankingX: boxX, rankingY: boxY, boxWidth } = layout;
 
     this.ctx.fillStyle = "rgba(13, 17, 23, 0.75)";
-    this.ctx.fillRect(this.canvas.width - 236, 16, 220, 140);
+    this.ctx.fillRect(boxX, boxY, boxWidth, 140);
     this.ctx.strokeStyle = "#30363d";
-    this.ctx.strokeRect(this.canvas.width - 236, 16, 220, 140);
+    this.ctx.strokeRect(boxX, boxY, boxWidth, 140);
 
     this.ctx.fillStyle = "#f0f6fc";
     this.ctx.font = "bold 16px system-ui, sans-serif";
-    this.ctx.fillText("Top 5", this.canvas.width - 220, 42);
+    this.ctx.fillText("Top 5", boxX + 16, boxY + 26);
 
     this.ctx.font = "14px system-ui, sans-serif";
     alive.forEach((snake, index) => {
       const isLeader = snake.id === leader?.id;
-      const textX = this.canvas.width - 220 + (isLeader ? 20 : 0);
+      const textX = boxX + 16 + (isLeader ? 20 : 0);
       const label = `${index + 1}. ${snake.name} (${snake.score})`;
       this.ctx.fillStyle = snake.isPlayer ? "#58a6ff" : "#c9d1d9";
-      this.ctx.fillText(label, textX, 66 + index * 22);
+      this.ctx.fillText(label, textX, boxY + 50 + index * 22);
 
       if (isLeader) {
-        this.drawCrown(this.canvas.width - 226, 61 + index * 22, 6);
+        this.drawCrown(boxX + 10, boxY + 45 + index * 22, 6);
       }
+    });
+  }
+
+  private renderKillFeed(world: World): void {
+    const messages = world.killFeed.getVisible();
+    if (messages.length === 0) return;
+
+    this.ctx.font = "13px system-ui, sans-serif";
+    const lineHeight = 24;
+    const bottomY = this.canvas.height - 16;
+
+    messages.forEach((message, index) => {
+      const fromBottom = messages.length - 1 - index;
+      const y = bottomY - fromBottom * lineHeight;
+      const textWidth = this.ctx.measureText(message.text).width;
+      const boxWidth = textWidth + 24;
+
+      this.ctx.fillStyle = "rgba(13, 17, 23, 0.7)";
+      this.ctx.fillRect(16, y - 18, boxWidth, 22);
+
+      this.ctx.fillStyle = message.color;
+      this.ctx.fillText(message.text, 28, y - 2);
     });
   }
 
