@@ -9,7 +9,7 @@ export class InputSystem {
 
   private mouseHeld = false;
   private spaceHeld = false;
-  private touchHeld = false;
+  private externalBoostHeld = false;
 
   attach(canvas: HTMLCanvasElement, camera: Camera): void {
     this.camera = camera;
@@ -50,15 +50,6 @@ export class InputSystem {
       const touch = event.touches[0];
       if (!touch) return;
       updatePointer(touch.clientX, touch.clientY);
-      this.touchHeld = true;
-    });
-
-    canvas.addEventListener("touchend", () => {
-      this.touchHeld = false;
-    });
-
-    canvas.addEventListener("touchcancel", () => {
-      this.touchHeld = false;
     });
 
     window.addEventListener("keydown", (event) => {
@@ -75,8 +66,12 @@ export class InputSystem {
     });
   }
 
+  setExternalBoost(held: boolean): void {
+    this.externalBoostHeld = held;
+  }
+
   isBoosting(): boolean {
-    return this.mouseHeld || this.touchHeld || this.spaceHeld;
+    return this.mouseHeld || this.spaceHeld || this.externalBoostHeld;
   }
 
   updatePlayerDirection(

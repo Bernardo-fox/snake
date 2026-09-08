@@ -3,6 +3,7 @@ import { Food } from "../entities/Food";
 import { Snake } from "../entities/Snake";
 import { distance, randomRange } from "../utils/math";
 import { DayNightCycle } from "./DayNightCycle";
+import { KillFeed } from "./KillFeed";
 import { RandomEventSystem } from "../systems/RandomEventSystem";
 
 export class World {
@@ -14,6 +15,7 @@ export class World {
 
   readonly dayNight = new DayNightCycle(GAME_CONFIG.dayNightCycleDurationMs);
   readonly events = new RandomEventSystem(0);
+  readonly killFeed = new KillFeed();
   totalElapsedMs = 0;
 
   readonly playerStats = { foodEaten: 0, kills: 0, survivalMs: 0 };
